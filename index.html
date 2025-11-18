@@ -164,6 +164,11 @@
             const [loading, setLoading] = useState(false);
             const [reveal, setReveal] = useState(false);
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-oQu_NIQAmJGNu8saRPOfbzrFl5wjyS8P9MuSkiYUpzLwds7XTYGbQrvPApDyYNtaTw/exec';
+        // styles list for the selectable word control
+        const styles = [
+          'Motivational', 'Uplifting', 'Encouraging', 'Inspirational', 'Positive', 'Bold', 'Calm', 'Confident', 'Energetic', 'Brave'
+        ];
+        const [styleIndex, setStyleIndex] = useState(0);
 
         // Simple DotGrid background component (lightweight, no GSAP)
         function DotGridOverlay(){
@@ -237,7 +242,8 @@
         async function generate(){
           setLoading(true); setReveal(false);
           try{
-            const url = GAS_URL + (GAS_URL.indexOf('?')===-1?'?':'&') + '_ts=' + Date.now() + '&n=' + encodeURIComponent(n);
+            const tone = styles[styleIndex] || 'Motivational';
+            const url = GAS_URL + (GAS_URL.indexOf('?')===-1?'?':'&') + '_ts=' + Date.now() + '&n=' + encodeURIComponent(n) + '&tone=' + encodeURIComponent(tone);
             console.log('Fetching URL:', url);
             const res = await fetch(url, { cache: 'no-store' });
             if(!res.ok) throw new Error('Network ' + res.status);
@@ -267,7 +273,18 @@
                   </span>
                   <span style={{fontSize:16, color:'#9fb0d3'}}>]</span>
                 </span>
-                &nbsp;words Motivational sentence.
+                &nbsp;words
+                &nbsp;
+                <span style={{display:'inline-flex',alignItems:'center',gap:12,padding:'6px 10px'}}>
+                  <span style={{fontSize:16, color:'#9fb0d3'}}>[</span>
+                  <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
+                    <button className="arrow" style={{padding:'6px 8px'}} onClick={()=>setStyleIndex(i=> (i+1) % styles.length)} aria-label="Increase style">▲</button>
+                    <div style={{padding:'6px 10px', minWidth:140, textAlign:'center', color:'#e8f6ff', fontWeight:700}}>{styles[styleIndex]}</div>
+                    <button className="arrow" style={{padding:'6px 8px'}} onClick={()=>setStyleIndex(i=> (i-1+styles.length) % styles.length)} aria-label="Decrease style">▼</button>
+                  </div>
+                  <span style={{fontSize:16, color:'#9fb0d3'}}>]</span>
+                </span>
+                &nbsp;sentence.
               </h1>
 
             <DecryptedText text={quote} reveal={reveal} />
