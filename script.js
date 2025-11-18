@@ -1,116 +1,60 @@
-
-// Replace the placeholder below with your deployed Google Apps Script web app URL.
+// Minimal client script: small vertical up/down buttons, enforce n=3..20, simple fetch to GAS
+// Replace GAS_URL with your deployed Google Apps Script web app URL if needed.
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbxvu4pgPyvx-N3FbGptzCzr411tmUdjnEZUzLr9XO0Bq5wG5r48hFTY0x7d7xkFittp0Q/exec';
+
 const btn = document.getElementById('generate');
 const quoteEl = document.getElementById('quote');
 const countInput = document.getElementById('count');
-const rangeInput = document.getElementById('range');
 const up = document.getElementById('up');
 const down = document.getElementById('down');
 
-// JSONP fallback for environments where CORS blocks fetch
-function jsonpFetch(url, timeout = 8000) {
-  // Replace the placeholder below with your deployed Google Apps Script web app URL.
-  const GAS_URL = 'https://script.google.com/macros/s/AKfycbxvu4pgPyvx-N3FbGptzCzr411tmUdjnEZUzLr9XO0Bq5wG5r48hFTY0x7d7xkFittp0Q/exec';
-  const btn = document.getElementById('generate');
-  const quoteEl = document.getElementById('quote');
-  const countInput = document.getElementById('count');
-  const rangeInput = document.getElementById('range');
-  const up = document.getElementById('up');
-  const down = document.getElementById('down');
+function clampN(v) {
+  v = Number(v) || 5;
+  if (v < 3) v = 3;
+  if (v > 20) v = 20;
+  return v;
+}
 
-  // JSONP fallback for environments where CORS blocks fetch
-  function jsonpFetch(url, timeout = 8000) {
-    return new Promise((resolve, reject) => {
-      const callbackName = 'aiq_cb_' + Math.random().toString(36).substring(2, 9);
-      const script = document.createElement('script');
-      const timer = setTimeout(() => {
-        // Replace the placeholder below with your deployed Google Apps Script web app URL.
-        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxvu4pgPyvx-N3FbGptzCzr411tmUdjnEZUzLr9XO0Bq5wG5r48hFTY0x7d7xkFittp0Q/exec';
-        const btn = document.getElementById('generate');
-        const quoteEl = document.getElementById('quote');
-        const countInput = document.getElementById('count');
-        const rangeInput = document.getElementById('range');
-        const up = document.getElementById('up');
-        const down = document.getElementById('down');
+function syncInputs(v) {
+  v = clampN(v);
+  countInput.value = v;
+}
 
-        // JSONP fallback for environments where CORS blocks fetch
-        function jsonpFetch(url, timeout = 8000) {
-          return new Promise((resolve, reject) => {
-            const callbackName = 'aiq_cb_' + Math.random().toString(36).substring(2, 9);
-            const script = document.createElement('script');
-            const timer = setTimeout(() => {
-              window[callbackName] = () => {};
-              if (script.parentNode) script.parentNode.removeChild(script);
-              reject(new Error('JSONP timeout'));
-            }, timeout);
+up.addEventListener('click', () => syncInputs(Number(countInput.value) + 1));
+down.addEventListener('click', () => syncInputs(Number(countInput.value) - 1));
+countInput.addEventListener('change', () => syncInputs(countInput.value));
 
-            window[callbackName] = (data) => {
-              clearTimeout(timer);
-              try { resolve({ok: true, json: async () => data}); }
-              finally { if (script.parentNode) script.parentNode.removeChild(script); delete window[callbackName]; }
-            };
+async function generate() {
+  btn.disabled = true;
+  const prev = btn.textContent;
+  btn.textContent = 'Generating...';
+  quoteEl.style.opacity = 0.7;
+  try {
+    const n = clampN(countInput.value);
+    const url = GAS_URL + (GAS_URL.indexOf('?') === -1 ? '?' : '&') + '_ts=' + Date.now() + '&n=' + encodeURIComponent(n);
+    const res = await fetch(url, { cache: 'no-store' });
+    if (!res.ok) {
+      quoteEl.textContent = 'Network error: ' + res.status;
+      return;
+    }
+    const data = await res.json();
+    if (data && data.quote) {
+      quoteEl.textContent = data.quote;
+    } else if (data && data.error) {
+      quoteEl.textContent = 'Error: ' + data.error;
+    } else {
+      quoteEl.textContent = 'No quote returned.';
+    }
+  } catch (err) {
+    quoteEl.textContent = 'Error: ' + (err && err.message ? err.message : String(err));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = prev;
+    quoteEl.style.opacity = 1;
+  }
+}
 
-            script.src = url + (url.indexOf('?') === -1 ? '?' : '&') + 'callback=' + callbackName;
-            script.onerror = () => { clearTimeout(timer); if (script.parentNode) script.parentNode.removeChild(script); delete window[callbackName]; reject(new Error('JSONP load error')); };
-            document.head.appendChild(script);
-          });
-        }
+btn.addEventListener('click', generate);
 
-        function syncInputs(val) {
-          val = Number(val);
-          if (!val) val = 5;
-          val = Math.max(3, Math.min(20, val));
-          countInput.value = val;
-          rangeInput.value = val;
-        }
-
-        up.addEventListener('click', () => { const v = Math.min(20, Number(countInput.value) + 1); syncInputs(v); });
-        down.addEventListener('click', () => { const v = Math.max(3, Number(countInput.value) - 1); syncInputs(v); });
-        countInput.addEventListener('change', () => { let v = Number(countInput.value); if (!v || v < 3) v = 3; if (v > 20) v = 20; syncInputs(v); });
-        rangeInput.addEventListener('input', (e) => syncInputs(e.target.value));
-
-        async function generate() {
-          btn.disabled = true;
-          btn.textContent = 'Generating...';
-          quoteEl.style.opacity = 0.6;
-          try {
-            const n = Math.max(3, Math.min(20, Number(countInput.value) || 5));
-            // always enforce n
-            const urlBase = GAS_URL;
-            const query = '_ts=' + Date.now() + '&n=' + encodeURIComponent(n);
-            const url = urlBase + (urlBase.indexOf('?') === -1 ? '?' : '&') + query;
-
-            // Try fetch first, fallback to JSONP if blocked
-            let res;
-            try {
-              res = await fetch(url, { cache: 'no-store' });
-              if (!res.ok) throw new Error('Network response was not ok');
-            } catch (err) {
-              res = await jsonpFetch(url);
-            }
-
-            const data = await res.json();
-            // Expecting { quote: '...' }
-            let out = (data && data.quote) ? data.quote : null;
-            if (!out) {
-              quoteEl.textContent = 'No quote returned. Try again.';
-            } else {
-              quoteEl.textContent = out;
-            }
-          } catch (err) {
-            quoteEl.textContent = 'Error: ' + (err.message || err);
-          } finally {
-            btn.disabled = false;
-            btn.textContent = 'Generate';
-            quoteEl.style.opacity = 1;
-          }
-        }
-
-        btn.addEventListener('click', generate);
-
-        // init
-        syncInputs(Number(countInput.value || 5));
-
-        // Optional: generate initially
-        // generate();
+// Initialize with a safe default
+syncInputs(countInput.value || 5);
