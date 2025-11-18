@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', function () {
   function syncInputs(v) {
     v = clampN(v);
     countInput.value = v;
+    countInput.classList.remove('num-animate');
+    void countInput.offsetWidth;
+    countInput.classList.add('num-animate');
   }
 
   up.addEventListener('click', function () { syncInputs(Number(countInput.value) + 1); });
@@ -27,9 +30,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
   async function generate() {
     btn.disabled = true;
-    const prev = btn.textContent;
-    btn.textContent = 'Generating...';
-    quoteEl.style.opacity = 0.7;
+    const prev = btn.querySelector('.btn-text') ? btn.querySelector('.btn-text').textContent : btn.textContent;
+    if(btn.querySelector('.btn-text')) btn.querySelector('.btn-text').textContent = 'Generating...';
+    btn.classList.add('loading');
+    quoteEl.classList.remove('in');
+    quoteEl.classList.add('out');
     try {
       const n = clampN(countInput.value);
       const url = GAS_URL + (GAS_URL.indexOf('?') === -1 ? '?' : '&') + '_ts=' + Date.now() + '&n=' + encodeURIComponent(n);
@@ -41,6 +46,8 @@ document.addEventListener('DOMContentLoaded', function () {
       const data = await res.json();
       if (data && data.quote) {
         quoteEl.textContent = data.quote;
+        quoteEl.classList.remove('out');
+        setTimeout(function(){ quoteEl.classList.add('in'); }, 20);
       } else if (data && data.error) {
         quoteEl.textContent = 'Error: ' + data.error;
       } else {
@@ -50,8 +57,8 @@ document.addEventListener('DOMContentLoaded', function () {
       quoteEl.textContent = 'Error: ' + (err && err.message ? err.message : String(err));
     } finally {
       btn.disabled = false;
-      btn.textContent = prev;
-      quoteEl.style.opacity = 1;
+      if(btn.querySelector('.btn-text')) btn.querySelector('.btn-text').textContent = prev;
+      btn.classList.remove('loading');
     }
   }
 
