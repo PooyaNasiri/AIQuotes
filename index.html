@@ -39,9 +39,10 @@
       button#generate.loading{box-shadow:0 14px 40px rgba(45,212,191,.08);transform:translateY(-2px)}
       button#generate.loading .spinner{opacity:1;transform:translateY(-50%) scale(1);animation:spin 900ms linear infinite}
       @keyframes spin{0%{transform:translateY(-50%) rotate(0)}100%{transform:translateY(-50%) rotate(360deg)}}
-      #quote{font-size:36px;margin:36px 0 44px;line-height:1.18;color:#e8f6ff;min-height:120px;transition:opacity .22s ease, transform .22s cubic-bezier(.2,.9,.2,1)}
-      #quote.out{opacity:0;transform:translateY(8px) scale(.98)}
-      #quote.in{opacity:1;transform:translateY(0) scale(1)}
+      /* apply styles to both id and class-based quote elements */
+      #quote, .quote{font-size:42px;margin:48px 0 56px;line-height:1.16;color:#e8f6ff;min-height:140px;transition:opacity .22s ease, transform .22s cubic-bezier(.2,.9,.2,1)}
+      #quote.out, .quote.out{opacity:0;transform:translateY(8px) scale(.98)}
+      #quote.in, .quote.in{opacity:1;transform:translateY(0) scale(1)}
 
       /* small decorative shimmer when generating */
       .shimmer{position:relative;overflow:hidden}
@@ -51,7 +52,7 @@
       footer{font-size:12px;color:#9fb0d3;margin-top:14px}
       @media (max-width:520px){
         .control-row{flex-direction:column}
-        #quote{font-size:20px;margin:18px 0 20px;min-height:64px}
+        #quote, .quote{font-size:22px;margin:18px 0 20px;min-height:72px}
         .arrow{min-width:36px;font-size:11px;height:28px;padding:4px 8px}
       }
     </style>
@@ -255,7 +256,7 @@
             <div style={{position:'relative', zIndex:1}}>
               <h1 id="title" style={{fontSize:18, marginBottom:12, fontWeight:800, letterSpacing:0.4}}>
                 Generate a&nbsp;
-                <span style={{display:'inline-flex',alignItems:'center',gap:12,padding:'6px 10px',background:'rgba(255,255,255,0.006)'}}>
+                <span style={{display:'inline-flex',alignItems:'center',gap:12,padding:'6px 10px'}}>
                   <span style={{fontSize:16, color:'#9fb0d3'}}>[</span>
                   <span style={{display:'inline-flex',alignItems:'center',gap:8}}>
                     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
