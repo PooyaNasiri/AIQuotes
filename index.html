@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AIQuotes — 5-word Motivator</title>
+    <style>
+      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;background:#0f172a;color:#e6eef8;margin:0}
+      .card{background:#0b1220;padding:28px;border-radius:12px;box-shadow:0 6px 30px rgba(2,6,23,.6);width:min(640px,92%);text-align:center}
+      button{background:#7c3aed;border:none;color:white;padding:12px 18px;border-radius:8px;font-size:16px;cursor:pointer}
+      button:disabled{opacity:.6;cursor:default}
+      #quote{font-size:24px;margin:20px 0;line-height:1.3}
+      footer{font-size:12px;color:#9fb0d3;margin-top:12px}
+    </style>
+  </head>
+  <body>
+    <main class="card">
+      <h1>5-word Motivator</h1>
+      <div id="quote">Click generate to receive a short motivational sentence.</div>
+      <div>
+        <button id="generate">Generate</button>
+      </div>
+      <footer>Powered by a small Google Apps Script backend + OpenAI API</footer>
+    </main>
+    <script src="script.js"></script>
+  </body>
+</html>
