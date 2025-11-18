@@ -7,7 +7,8 @@ async function generate() {
   btn.disabled = true;
   btn.textContent = 'Generating...';
   try {
-    const res = await fetch(GAS_URL);
+    const url = GAS_URL + (GAS_URL.indexOf('?') === -1 ? '?' : '&') + '_ts=' + Date.now();
+    const res = await fetch(url, { cache: 'no-store' });
     if (!res.ok) throw new Error('Network response was not ok');
     const data = await res.json();
     quoteEl.textContent = data.quote || 'No quote returned.';
