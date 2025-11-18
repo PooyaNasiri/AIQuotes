@@ -15,12 +15,15 @@ Quick Steps
    - Who has access: `Anyone`
    Copy the deployment URL.
 4. Update `script.js` and set `GAS_URL` to your deployment URL.
+   - The UI now has a fancy control to pick `N` (1–20 by default). Use the number field, range slider, or +/- buttons.
 5. Push the repo to GitHub and enable GitHub Pages from the `main` branch (root). The `index.html` will be served as a demo.
 
 Notes & caveats
 - Keep your OpenAI API key secret. The Apps Script runs server-side so the key is not exposed in the client.
 - If you need CORS changes or run into cross-origin errors, ensure the web app is deployed with the correct access settings.
 - The `Code.gs` uses the Chat Completions endpoint and requests a short, five-word sentence. Adjust `model` or prompt if you prefer other behavior.
+ - The `Code.gs` now accepts a query parameter `n` (word count). Example request: `?n=7`.
+ - The client sends `n` automatically based on the UI control. The server tries multiple completions and trims or selects a valid `n`-word output.
 
 If you want, I can:
 - Deploy a simple GitHub Actions workflow to automatically publish the `main` branch to GitHub Pages.
