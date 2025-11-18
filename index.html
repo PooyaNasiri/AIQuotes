@@ -42,28 +42,108 @@
   </head>
   <body>
     <main class="card">
-      <h1 id="title">Motivator — very fancy</h1>
-
-      <div class="controls" aria-hidden="false">
-        <div class="control-row" style="align-items:center;">
-          <label for="count" class="label">Words</label>
-          <div class="vertical-number" aria-hidden="false">
-            <button id="up" class="arrow" aria-label="Increase">▲</button>
-            <input id="count" type="number" min="3" max="20" value="5" />
-            <button id="down" class="arrow" aria-label="Decrease">▼</button>
-          </div>
-          <!-- range slider removed per request -->
-        </div>
-      </div>
-
-      <div id="quote" class="quote shimmer in">Click generate to receive a motivational sentence.</div>
-
-      <div>
-        <button id="generate"><span class="btn-text">Generate</span><span class="spinner" aria-hidden="true"></span></button>
-      </div>
-
-      <footer>Powered by a Google Apps Script backend + OpenAI API</footer>
+      <div id="root"></div>
     </main>
-    <script src="script.js"></script>
+
+    <!-- React + Babel (CDN) -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Small React app implementing a fancy Counter and DecryptedText reveal -->
+    <script type="text/babel">
+      const { useState, useEffect, useRef } = React;
+
+      // Simple DecryptedText: reveals text character-by-character with 'decrypt' effect
+      function DecryptedText({ text, reveal }){
+        const [out, setOut] = useState('');
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        useEffect(()=>{
+          if(!reveal){ setOut(text); return; }
+          let cancelled = false;
+          const target = text || '';
+          const len = target.length;
+          let frame = 0;
+          const steps = 18 + Math.floor(len/2);
+          const interval = 28;
+          const tm = setInterval(()=>{
+            frame++;
+            let s = '';
+            for(let i=0;i<len;i++){
+              if(i < Math.floor((frame/steps)*len)) s += target[i];
+              else s += alphabet[Math.floor(Math.random()*alphabet.length)];
+            }
+            if(!cancelled) setOut(s);
+            if(frame >= steps){
+              if(!cancelled) setOut(target);
+              clearInterval(tm);
+            }
+          }, interval);
+          return ()=>{ cancelled = true; clearInterval(tm); };
+        }, [text, reveal]);
+        return (<div className="quote shimmer in" aria-live="polite">{out}</div>);
+      }
+
+      // Fancy counter inspired by reactbits counter
+      function FancyCounter({ value, onChange }){
+        const [n, setN] = useState(value);
+        useEffect(()=> setN(value), [value]);
+        const bump = (v)=>{ const nv = Math.max(3, Math.min(20, v)); setN(nv); onChange && onChange(nv); };
+        return (
+          <div className="control-row" style={{alignItems:'center'}}>
+            <label className="label" style={{marginRight:10}}>Words</label>
+            <div className="vertical-number">
+              <button className="arrow" onClick={()=>bump(n+1)} aria-label="Increase">▲</button>
+              <input className="num" type="number" value={n} min={3} max={20} onChange={(e)=>bump(Number(e.target.value)||3)} />
+              <button className="arrow" onClick={()=>bump(n-1)} aria-label="Decrease">▼</button>
+            </div>
+          </div>
+        );
+      }
+
+      function App(){
+        const [n, setN] = useState(5);
+        const [quote, setQuote] = useState('Click generate to receive a motivational sentence.');
+        const [loading, setLoading] = useState(false);
+        const [reveal, setReveal] = useState(false);
+        const GAS_URL = 'https://script.google.com/macros/s/AKfycbxvu4pgPyvx-N3FbGptzCzr411tmUdjnEZUzLr9XO0Bq5wG5r48hFTY0x7d7xkFittp0Q/exec';
+
+        async function generate(){
+          setLoading(true); setReveal(false);
+          try{
+            const url = GAS_URL + (GAS_URL.indexOf('?')===-1?'?':'&') + '_ts=' + Date.now() + '&n=' + encodeURIComponent(n);
+            const res = await fetch(url, { cache: 'no-store' });
+            if(!res.ok) throw new Error('Network ' + res.status);
+            const data = await res.json();
+            setQuote(data && data.quote ? data.quote : 'No quote returned.');
+            // reveal with decrypted animation
+            setTimeout(()=> setReveal(true), 80);
+          }catch(err){ setQuote('Error: ' + (err.message||err)); setReveal(true); }
+          finally{ setLoading(false); }
+        }
+
+        return (
+          <div>
+            <h1 id="title">Motivator — animated</h1>
+            <div className="controls">
+              <FancyCounter value={n} onChange={setN} />
+            </div>
+
+            <DecryptedText text={quote} reveal={reveal} />
+
+            <div style={{marginTop:8}}>
+              <button id="generate" className={loading? 'loading' : ''} onClick={generate}>
+                <span className="btn-text">{loading? 'Generating...' : 'Generate'}</span>
+                <span className="spinner" aria-hidden="true" style={{display: loading? 'inline-block':'none'}}></span>
+              </button>
+            </div>
+
+            <footer style={{marginTop:14,fontSize:12,color:'#9fb0d3'}}>Powered by a Google Apps Script backend + OpenAI API</footer>
+          </div>
+        );
+      }
+
+      ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
   </body>
 </html>
