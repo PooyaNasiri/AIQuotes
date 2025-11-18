@@ -1,6 +1,6 @@
 // Minimal client script: small vertical up/down buttons, enforce n=3..20, simple fetch to GAS
 // Replace GAS_URL with your deployed Google Apps Script web app URL if needed.
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbxvu4pgPyvx-N3FbGptzCzr411tmUdjnEZUzLr9XO0Bq5wG5r48hFTY0x7d7xkFittp0Q/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-oQu_NIQAmJGNu8saRPOfbzrFl5wjyS8P9MuSkiYUpzLwds7XTYGbQrvPApDyYNtaTw/exec';
 
 document.addEventListener('DOMContentLoaded', function () {
   const btn = document.getElementById('generate');
