@@ -12,9 +12,10 @@
       .control-row{display:flex;gap:12px;align-items:center}
       .control-row.small{font-size:13px;color:#9fb0d3}
       .label{font-weight:600}
-      .fancy-number{display:flex;align-items:center;background:rgba(255,255,255,0.02);padding:4px;border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-      .fancy-number button{background:transparent;border:none;color:#cfe6ff;padding:8px 10px;font-size:20px;cursor:pointer}
-      .fancy-number input[type=number]{width:64px;background:transparent;border:none;color:#e6eef8;text-align:center;font-size:16px}
+      .vertical-number{display:flex;flex-direction:column;align-items:center;background:rgba(255,255,255,0.02);padding:6px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);width:74px}
+      .vertical-number .arrow{background:transparent;border:none;color:#cfe6ff;padding:2px 6px;font-size:14px;cursor:pointer;line-height:1}
+      .vertical-number input[type=number]{width:56px;background:transparent;border:none;color:#e6eef8;text-align:center;font-size:18px;-moz-appearance:textfield}
+      input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
       input[type=range]{width:220px}
       button#generate{background:linear-gradient(90deg,#7c3aed,#2dd4bf);border:none;color:#041025;padding:12px 20px;border-radius:12px;font-weight:700;cursor:pointer;box-shadow:0 6px 18px rgba(124,58,237,.18)}
       button#generate:active{transform:translateY(1px)}
@@ -28,19 +29,14 @@
       <h1 id="title">Motivator — very fancy</h1>
 
       <div class="controls" aria-hidden="false">
-        <div class="control-row">
+        <div class="control-row" style="align-items:center;">
           <label for="count" class="label">Words</label>
-          <div class="fancy-number">
-            <button id="dec" aria-label="Decrease">−</button>
-            <input id="count" type="number" min="1" max="20" value="5" />
-            <button id="inc" aria-label="Increase">+</button>
+          <div class="vertical-number" aria-hidden="false">
+            <button id="up" class="arrow" aria-label="Increase">▲</button>
+            <input id="count" type="number" min="3" max="20" value="5" />
+            <button id="down" class="arrow" aria-label="Decrease">▼</button>
           </div>
-          <input id="range" type="range" min="1" max="20" value="5" />
-        </div>
-
-        <div class="control-row small">
-          <label><input id="capitalize" type="checkbox" /> Capitalize first word</label>
-          <label><input id="strict" type="checkbox" checked /> Enforce exact word count</label>
+          <input id="range" type="range" min="3" max="20" value="5" />
         </div>
       </div>
 
