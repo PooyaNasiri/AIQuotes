@@ -13,7 +13,7 @@ async function generate() {
     const data = await res.json();
     quoteEl.textContent = data.quote || 'No quote returned.';
   } catch (err) {
-    quoteEl.textContent = 'Error: ' + (err.message || err);
+    quoteEl.textContent = '!Error: ' + (err.message || err);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Generate';
