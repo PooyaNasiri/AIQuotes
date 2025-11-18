@@ -27,33 +27,87 @@
       .counter-counter { display: flex; overflow: hidden; line-height: 1; }
       .counter-digit { position: relative; width: 1ch; font-variant-numeric: tabular-nums; }
       .counter-number { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display:flex; align-items:center; justify-content:center; }
-      .gradient-container { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; }
-      .bottom-gradient { position: absolute; bottom: 0; width: 100%; }
+      /* .gradient-container { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; } */
+      /* .bottom-gradient { position: absolute; bottom: 0; width: 100%; } */
       /* dot-grid background (subtle overlay like reactbits dot-grid) */
       body::before{content:'';position:fixed;inset:0;pointer-events:none;opacity:0.06;background-image:radial-gradient(rgba(255,255,255,0.12) 1px, rgba(255,255,255,0) 1px);background-size:18px 18px;mix-blend-mode:overlay}
       input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-      button#generate{position:relative;overflow:hidden;background:linear-gradient(90deg,#7c3aed,#2dd4bf);border:none;color:#041025;padding:12px 22px;border-radius:14px;font-weight:800;cursor:pointer;box-shadow:0 10px 30px rgba(124,58,237,.14);transition:transform .12s ease, box-shadow .12s ease}
-      button#generate:active{transform:translateY(1px) scale(.996)}
-      button#generate .btn-text{display:inline-block;transition:transform .18s cubic-bezier(.2,.9,.2,1)}
-      button#generate .spinner{position:absolute;right:12px;top:50%;transform:translateY(-50%) scale(.6);width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 3px rgba(255,255,255,0.15);opacity:0;transition:opacity .18s, transform .18s}
+      button#generate{position:relative;overflow:hidden;background:linear-gradient(90deg,#7c3aed,#2dd4bf);border:none;color:#041025;padding:12px 22px;border-radius:14px;font-weight:800;cursor:pointer;box-shadow:0 10px 30px rgba(124,58,237,.14);transition:transform .12s ease, box-shadow .12s ease;background-size:200% 200%}
+      /* fancy hover and animated gradient */
+      /* button#generate:hover{transform:translateY(-4px) scale(1.02);box-shadow:0 18px 50px rgba(124,58,237,.25),0 6px 22px rgba(45,212,191,.12);filter:brightness(1.06)} */
+      /* button#generate:before{content:'';position:absolute;inset:0;border-radius:14px;pointer-events:none;background:radial-gradient(120px 60px at 20% 10%, rgba(255,255,255,0.18), rgba(255,255,255,0) 30%);opacity:0;transition:opacity .25s} */
+      /* button#generate:hover:before{opacity:1} */
+      /* animated gradient movement */
+      /* @keyframes gradientMove{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+      button#generate.animate-bg{animation:gradientMove 6s linear infinite} */
+      /* sheen effect sliding across on click */
+      button#generate:after{content:'';position:absolute;left:-60%;top:0;width:60%;height:100%;transform:skewX(-18deg);background:linear-gradient(90deg,rgba(255,255,255,0),rgba(255,255,255,0.12),rgba(255,255,255,0));opacity:0;transition:opacity .12s, transform .42s}
+      button#generate.sheen:after{opacity:1;transform:translateX(220%)}
+      /* pop animation when clicked */
+      @keyframes pop {0%{transform:scale(1)}40%{transform:scale(1.08)}100%{transform:scale(1)}}
+      button#generate.pop{animation:pop .32s cubic-bezier(.2,.9,.2,1)}
+      /* loading tweaks */
       button#generate.loading{box-shadow:0 14px 40px rgba(45,212,191,.08);transform:translateY(-2px)}
-      button#generate.loading .spinner{opacity:1;transform:translateY(-50%) scale(1);animation:spin 900ms linear infinite}
-      @keyframes spin{0%{transform:translateY(-50%) rotate(0)}100%{transform:translateY(-50%) rotate(360deg)}}
+      button#generate.loading .btn-text{transform:translateX(-6px)}
+      /* spinner already present */
+      button#generate .btn-text{display:inline-block;transition:transform .18s cubic-bezier(.2,.9,.2,1)}
       /* apply styles to both id and class-based quote elements */
-      #quote, .quote{font-size:42px;margin:48px 0 56px;line-height:1.16;color:#e8f6ff;min-height:140px;transition:opacity .22s ease, transform .22s cubic-bezier(.2,.9,.2,1)}
-      #quote.out, .quote.out{opacity:0;transform:translateY(8px) scale(.98)}
+      /* Large, well-spaced quote area */
+      #quote, .quote{
+        font-size:56px;
+        margin:64px 0 72px;
+        line-height:1.14;
+        color:#e8f6ff;
+        min-height:220px;
+        transition:opacity .22s ease, transform .22s cubic-bezier(.2,.9,.2,1);
+        z-index:2; /* ensure quote sits above decorative layers */
+        position:relative;
+        text-wrap:balance;
+      }
+      #quote.out, .quote.out{opacity:0;transform:translateY(12px) scale(.98)}
       #quote.in, .quote.in{opacity:1;transform:translateY(0) scale(1)}
 
       /* small decorative shimmer when generating */
       .shimmer{position:relative;overflow:hidden}
       .shimmer:after{content:'';position:absolute;left:-40%;top:0;width:40%;height:100%;transform:skewX(-18deg);background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.07), rgba(255,255,255,0));opacity:0;transition:opacity .12s}
-      button#generate.loading ~ .quote.shimmer:after{opacity:1;animation:shimmer 900ms linear}
+      /* button#generate.loading ~ .quote.shimmer:after{opacity:1;animation:shimmer 900ms linear} */
       @keyframes shimmer{0%{left:-40%}100%{left:140%}}
       footer{font-size:12px;color:#9fb0d3;margin-top:14px}
       @media (max-width:520px){
         .control-row{flex-direction:column}
         #quote, .quote{font-size:22px;margin:18px 0 20px;min-height:72px}
         .arrow{min-width:36px;font-size:11px;height:28px;padding:4px 8px}
+      }
+      /* ---------- Gooey single-element button styles (adapted) ---------- */
+      @property --a { syntax: "<percentage>"; initial-value: 0%; inherits: true; }
+      @property --hue { syntax: "<angle>"; initial-value: 170deg; inherits: false; }
+
+      :root{ --spring-easing: linear(0,0.002,0.01 0.9%,0.038 1.8%,0.156,0.312 5.8%,0.789 11.1%,1.015 14.2%,1.096,1.157,1.199,1.224 20.3%,1.231,1.231,1.226,1.214 24.6%,1.176 26.9%,1.057 32.6%,1.007 35.5%,0.984,0.968,0.956,0.949 42%,0.946 44.1%,0.95 46.5%,0.998 57.2%,1.007,1.011 63.3%,1.012 68.3%,0.998 84%,1); --spring-duration:1.66s }
+
+      /* hue animation used by the gooey button */
+      @keyframes color {
+        from { --hue: 0deg; }
+        to   { --hue: 600deg; }
+      }
+
+      /* Make the generate button purely gooey (single visible blurred layer) */
+      #generate.gooey{
+        --a: 0%; --hue: 170deg; --x:50; --y:50; --button: hsl(var(--hue),66%,66%); --size:2em;
+        background: transparent; /* no solid base — visual comes from :before */
+        color: #041025; /* text color placed above the goo layer */
+        font-size:1.05rem; position:relative; padding:calc(var(--size)*0.6) calc(var(--size)*1.2);
+        transition: --a .45s ease-in-out, scale var(--spring-duration) var(--spring-easing); scale:0.98;
+        isolation:isolate; border-radius:14px; cursor:pointer; border:none; box-shadow:none;
+      }
+      #generate.gooey:hover{ --a:100%; transition-duration:.45s,1s; scale:1 }
+
+      /* The blurred gooey blob behind the button provides the visible shape */
+      #generate.gooey:before{ content:""; position:absolute; inset:0; filter: blur(12px) url(#goo) drop-shadow(0 .25em .5em rgba(0,0,0,0.6));
+        /* base color is a subtle linear, plus a radial color that follows pointer via --x/--y */
+        background-image:
+          linear-gradient(0deg, var(--button), var(--button)),
+          radial-gradient(40% 70% at calc(var(--x) * 1%) calc(var(--y) * 1%), hsla(var(--hue),77%,77%,var(--a)) 0%, transparent 90%);
+        background-clip: content-box, border-box; padding: 14px; z-index:-1; border-radius:inherit; animation:color 20s linear infinite both;
       }
     </style>
   </head>
@@ -137,7 +191,8 @@
               if(pos < -5) pos += 10;
               if(pos > 4) pos -= 10;
               const memo = pos * height;
-              const style = { transform: `translateY(${memo}px)` };
+              // NEGATE memo to invert the animation direction so "up" increments move digits downward
+              const style = { transform: `translateY(${-memo}px)` };
               return (<div key={i} className="counter-number" style={style}>{i}</div>);
             })}
           </div>
@@ -158,19 +213,80 @@
         );
       }
 
+      // WordScroller: animates a vertical list of words similar to the Digit scroller
+      function WordScroller({ items, index, fontSize = 30, lineHeight = 40, minWidth = 180 }){
+        const height = lineHeight;
+        const animatedRef = useRef(index);
+        const [, setTick] = useState(0);
+        const targetRef = useRef(index);
+
+        useEffect(()=>{ targetRef.current = index; }, [index]);
+
+        useEffect(()=>{
+          let raf;
+          let mounted = true;
+          function step(){
+            if(!mounted) return;
+            const cur = animatedRef.current;
+            const target = targetRef.current;
+            const diff = target - cur;
+            const next = Math.abs(diff) < 0.0001 ? target : cur + diff * 0.22;
+            animatedRef.current = next;
+            setTick(t => t + 1);
+            raf = requestAnimationFrame(step);
+          }
+          raf = requestAnimationFrame(step);
+          return ()=>{ mounted = false; cancelAnimationFrame(raf); };
+        }, []);
+
+        const len = items.length;
+        return (
+          <div style={{height:height + 'px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', minWidth: minWidth + 'px'}}>
+            <div style={{position:'relative', height: height + 'px'}}>
+              {items.map((it, i) => {
+                // position each word relative to the animated fractional index, wrap circularly
+                const animated = animatedRef.current;
+                let pos = (i - animated) % len;
+                if(pos < -len/2) pos += len;
+                if(pos > len/2) pos -= len;
+                const y = pos * height;
+                const style = { position: 'absolute', left:0, right:0, top:0, height: height + 'px', display:'flex', alignItems:'center', justifyContent:'center', transform: `translateY(${y}px)`, color:'#e8f6ff', fontWeight:900, fontSize: fontSize + 'px', lineHeight: height + 'px' };
+                return (<div key={i} style={style} aria-hidden={i !== index}>{it}</div>);
+              })}
+            </div>
+          </div>
+        );
+      }
+
       function App(){
           const [n, setN] = useState(5);
             const [quote, setQuote] = useState('');
             const [loading, setLoading] = useState(false);
             const [reveal, setReveal] = useState(false);
+          // hook to wire gooey button interactions (pointer tracking + intro)
+          useEffect(()=>{
+            const btn = document.getElementById('generate');
+            if(!btn) return;
+            let introInterval;
+            function moveBg(e){ const rect = btn.getBoundingClientRect(); btn.style.setProperty('--x', ((e.clientX - rect.x)/rect.width)*100); btn.style.setProperty('--y', ((e.clientY - rect.y)/rect.height)*100); }
+            function onOver(e){ clearInterval(introInterval); e.target.style.setProperty('--a',''); }
+            function intro(){ let i = 4; btn.style.setProperty('--a','100%'); introInterval = setInterval(()=>{ btn.style.setProperty('--x', ((Math.cos(i)+2)/3.6)*100); btn.style.setProperty('--y', ((Math.sin(i)+2)/3.6)*100); i+=0.03; if(i>11.5){ clearInterval(introInterval); btn.style.setProperty('--a',''); } },16); }
+            btn.addEventListener('pointermove', moveBg);
+            btn.addEventListener('pointerover', onOver);
+            intro();
+            return ()=>{ btn.removeEventListener('pointermove', moveBg); btn.removeEventListener('pointerover', onOver); clearInterval(introInterval); };
+          }, []);
+
         const GAS_URL = 'https://script.google.com/macros/s/AKfycby9UbqEoL7JDLnv9xbHlsOwIJv6jIlSHOE2m_gL2_yiA6OV8H51ruarg6kmgzix1ruuFQ/exec';
         // styles list for the selectable word control (diverse tones)
         const styles = [
-          'Motivational','Uplifting','Encouraging','Inspirational','Positive',
-          'Neutral','Funny','Sarcastic','Angry','Playful',
-          'Dark','Melancholic','Bold','Confident','Calm',
-          'Brave','Weird','Silly','Cynical','Bad'
+          'Cynical', 'Melancholic', 'Funny', 'Motivational', 'Playful',
+          'Dark', 'Bad', 'Brave', 'Uplifting', 'Silly',
+          'Bold', 'Neutral', 'Angry', 'Confident', 'Inspirational',
+          'Encouraging', 'Positive', 'Sarcastic', 'Weird', 'Calm',
+          'Quirky', 'Philosophical', 'Dramatic', 'Nostalgic', 'Hopeful'
         ];
+
         const [styleIndex, setStyleIndex] = useState(0);
 
         // Simple DotGrid background component (lightweight, no GSAP)
@@ -247,6 +363,18 @@
         }
 
         async function generate(){
+          // add quick visual pop + sheen before starting the request
+          const btn = document.getElementById('generate');
+          if(btn){
+            btn.classList.remove('pop');
+            // force reflow so animation retriggers
+            void btn.offsetWidth;
+            btn.classList.add('pop');
+            btn.classList.add('sheen');
+            // animate background continuously while active
+            btn.classList.add('animate-bg');
+            setTimeout(()=>{ btn.classList.remove('sheen'); }, 420);
+          }
           setLoading(true); setReveal(false);
           try{
             const tone = styles[styleIndex] || 'Motivational';
@@ -286,7 +414,7 @@
                   <span style={{fontSize:16, color:'#9fb0d3'}}>[</span>
                   <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
                     <button className="arrow" style={{padding:'6px 8px'}} onClick={()=>setStyleIndex(i=> (i+1) % styles.length)} aria-label="Increase style">▲</button>
-                    <div style={{padding:'6px 10px', minWidth:140, textAlign:'center', color:'#e8f6ff', fontWeight:900, fontSize:30, lineHeight:'40px'}}>{styles[styleIndex]}</div>
+                    <WordScroller items={styles} index={styleIndex} fontSize={30} lineHeight={40} minWidth={200} />
                     <button className="arrow" style={{padding:'6px 8px'}} onClick={()=>setStyleIndex(i=> (i-1+styles.length) % styles.length)} aria-label="Decrease style">▼</button>
                   </div>
                   <span style={{fontSize:16, color:'#9fb0d3'}}>]</span>
@@ -297,9 +425,8 @@
             <DecryptedText text={quote} reveal={reveal} />
 
             <div style={{marginTop:8}}>
-              <button id="generate" className={loading? 'loading' : ''} onClick={generate}>
+              <button id="generate" type="button" className={`gooey ${loading? 'loading' : ''}`} onClick={generate}>
                 <span className="btn-text">{loading? 'Generating...' : 'Generate'}</span>
-                <span className="spinner" aria-hidden="true" style={{display: loading? 'inline-block':'none'}}></span>
               </button>
             </div>
 
@@ -311,5 +438,18 @@
 
       ReactDOM.createRoot(document.getElementById('root')).render(<App />);
     </script>
+
+    <!-- goo SVG filter (required for gooey blur) -->
+    <svg width="0" height="0" style="position:absolute">
+      <filter id="goo" x="-50%" y="-50%" width="200%" height="200%">
+        <feComponentTransfer>
+          <feFuncA type="discrete" tableValues="0 1"></feFuncA>
+        </feComponentTransfer>
+        <feGaussianBlur stdDeviation="5"></feGaussianBlur>
+        <feComponentTransfer>
+          <feFuncA type="table" tableValues="-5 11"></feFuncA>
+        </feComponentTransfer>
+      </filter>
+    </svg>
   </body>
 </html>
