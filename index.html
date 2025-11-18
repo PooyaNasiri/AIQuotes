@@ -95,9 +95,9 @@
 
       // Rich animated Counter (single-file, no external motion lib)
       function Digit({ place, value, height, digitStyle }){
-        // valueRoundedToPlace like Math.floor(value / place)
         const valueRoundedToPlace = Math.floor(value / place);
-        const [animated, setAnimated] = useState(valueRoundedToPlace);
+        const animatedRef = useRef(valueRoundedToPlace);
+        const [, setTick] = useState(0);
         const targetRef = useRef(valueRoundedToPlace);
 
         useEffect(()=>{ targetRef.current = valueRoundedToPlace; }, [valueRoundedToPlace]);
@@ -107,31 +107,28 @@
           let mounted = true;
           function step(){
             if(!mounted) return;
-            const cur = animated;
+            const cur = animatedRef.current;
             const target = targetRef.current;
             const diff = target - cur;
-            // spring-ish lerp
-            const next = Math.abs(diff) < 0.001 ? target : cur + diff * 0.22;
-            if(Math.abs(next - cur) > 0.0001){
-              setAnimated(next);
-              raf = requestAnimationFrame(step);
-            } else {
-              setAnimated(target);
-            }
+            const next = Math.abs(diff) < 0.0001 ? target : cur + diff * 0.22;
+            animatedRef.current = next;
+            // trigger render
+            setTick(t => t + 1);
+            raf = requestAnimationFrame(step);
           }
           raf = requestAnimationFrame(step);
           return ()=>{ mounted = false; cancelAnimationFrame(raf); };
-        }, [valueRoundedToPlace]);
+        }, []);
 
-        // render 0..9 stacked; each Number will compute its translateY based on animated
         return (
           <div className="counter-digit" style={{ height: height + 'px', ...digitStyle }}>
             {Array.from({length:10}, (_, i)=>{
-              // compute offset like original formula
-              const placeValue = animated % 10;
-              const offset = (10 + i - placeValue) % 10;
-              let memo = offset * height;
-              if(offset > 5) memo -= 10 * height;
+              const animated = animatedRef.current;
+              // compute continuous offset and wrap to nearest -5..4
+              let pos = (i - animated) % 10;
+              if(pos < -5) pos += 10;
+              if(pos > 4) pos -= 10;
+              const memo = pos * height;
               const style = { transform: `translateY(${memo}px)` };
               return (<div key={i} className="counter-number" style={style}>{i}</div>);
             })}
@@ -160,6 +157,75 @@
             const [reveal, setReveal] = useState(false);
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-oQu_NIQAmJGNu8saRPOfbzrFl5wjyS8P9MuSkiYUpzLwds7XTYGbQrvPApDyYNtaTw/exec';
 
+        // Simple DotGrid background component (lightweight, no GSAP)
+        function DotGridOverlay(){
+          const canvasRef = useRef(null);
+          const wrapperRef = useRef(null);
+          const dotsRef = useRef([]);
+          useEffect(()=>{
+            const canvas = canvasRef.current;
+            const wrap = wrapperRef.current;
+            if(!canvas || !wrap) return;
+            const resize = ()=>{
+              const rect = wrap.getBoundingClientRect();
+              const dpr = window.devicePixelRatio || 1;
+              canvas.width = rect.width * dpr;
+              canvas.height = rect.height * dpr;
+              canvas.style.width = rect.width + 'px';
+              canvas.style.height = rect.height + 'px';
+              const gap = 18;
+              const dotSize = 6;
+              const cols = Math.floor((rect.width + gap)/(dotSize+gap));
+              const rows = Math.floor((rect.height + gap)/(dotSize+gap));
+              const cell = dotSize + gap;
+              const gridW = cell * cols - gap;
+              const gridH = cell * rows - gap;
+              const extraX = rect.width - gridW;
+              const extraY = rect.height - gridH;
+              const startX = extraX/2 + dotSize/2;
+              const startY = extraY/2 + dotSize/2;
+              const dots = [];
+              for(let y=0;y<rows;y++){
+                for(let x=0;x<cols;x++){
+                  dots.push({cx: startX + x*cell, cy: startY + y*cell, ox:0, oy:0});
+                }
+              }
+              dotsRef.current = dots;
+            };
+            resize();
+            window.addEventListener('resize', resize);
+            let raf;
+            const pointer = {x:-9999,y:-9999};
+            window.addEventListener('mousemove', (e)=>{ const r = canvas.getBoundingClientRect(); pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; });
+            window.addEventListener('click', (e)=>{ const r = canvas.getBoundingClientRect(); const cx = e.clientX - r.left; const cy = e.clientY - r.top; for(const d of dotsRef.current){ const dist = Math.hypot(d.cx-cx,d.cy-cy); if(dist<120){ const f = 1 - dist/120; d.ox += (d.cx-cx)*0.04*f; d.oy += (d.cy-cy)*0.04*f; } } });
+            function draw(){
+              const ctx = canvas.getContext('2d');
+              if(!ctx) return;
+              ctx.clearRect(0,0,canvas.width,canvas.height);
+              const rect = canvas.getBoundingClientRect();
+              const dpr = window.devicePixelRatio || 1;
+              ctx.save(); ctx.scale(dpr,dpr);
+              for(const d of dotsRef.current){
+                // simple spring back
+                d.ox *= 0.92; d.oy *= 0.92;
+                const dx = d.cx - pointer.x; const dy = d.cy - pointer.y;
+                const dist = Math.hypot(dx,dy);
+                let alpha = 0.06;
+                if(dist<150) alpha = 0.18*(1 - dist/150) + 0.02;
+                ctx.beginPath();
+                ctx.fillStyle = `rgba(82,39,255,${alpha})`;
+                ctx.arc(d.cx + d.ox, d.cy + d.oy, 3, 0, Math.PI*2);
+                ctx.fill();
+              }
+              ctx.restore();
+              raf = requestAnimationFrame(draw);
+            }
+            raf = requestAnimationFrame(draw);
+            return ()=>{ window.removeEventListener('resize', resize); cancelAnimationFrame(raf); };
+          }, []);
+          return (<div style={{position:'absolute',inset:0,zIndex:0}} ref={wrapperRef}><canvas ref={canvasRef} style={{width:'100%',height:'100%'}} /></div>);
+        }
+
         async function generate(){
           setLoading(true); setReveal(false);
           try{
@@ -177,8 +243,10 @@
         }
 
         return (
-          <div>
-            <h1 id="title">Motivator — animated</h1>
+          <div style={{position:'relative'}}>
+            <DotGridOverlay />
+            <div style={{position:'relative', zIndex:1}}>
+              <h1 id="title">Motivator — animated</h1>
             <div className="controls">
               <div className="control-row" style={{alignItems:'center'}}>
                 <label className="label" style={{marginRight:10}}>Words</label>
@@ -201,7 +269,8 @@
               </button>
             </div>
 
-            <footer style={{marginTop:14,fontSize:12,color:'#9fb0d3'}}>Powered by a Google Apps Script backend + OpenAI API</footer>
+              <footer style={{marginTop:14,fontSize:12,color:'#9fb0d3'}}>Powered by a Google Apps Script backend + OpenAI API</footer>
+            </div>
           </div>
         );
       }
