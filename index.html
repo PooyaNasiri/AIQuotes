@@ -152,18 +152,16 @@
       }
 
       function App(){
-        const [n, setN] = useState(5);
-          const [quote, setQuote] = useState('Click generate to receive a motivational sentence.');
-          const [loading, setLoading] = useState(false);
-          const [reveal, setReveal] = useState(false);
-          const [lastURL, setLastURL] = useState('');
+          const [n, setN] = useState(5);
+            const [quote, setQuote] = useState('Click generate to receive a motivational sentence.');
+            const [loading, setLoading] = useState(false);
+            const [reveal, setReveal] = useState(false);
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbx-oQu_NIQAmJGNu8saRPOfbzrFl5wjyS8P9MuSkiYUpzLwds7XTYGbQrvPApDyYNtaTw/exec';
 
         async function generate(){
           setLoading(true); setReveal(false);
           try{
             const url = GAS_URL + (GAS_URL.indexOf('?')===-1?'?':'&') + '_ts=' + Date.now() + '&n=' + encodeURIComponent(n);
-            setLastURL(url);
             console.log('Fetching URL:', url);
             const res = await fetch(url, { cache: 'no-store' });
             if(!res.ok) throw new Error('Network ' + res.status);
@@ -180,7 +178,17 @@
           <div>
             <h1 id="title">Motivator — animated</h1>
             <div className="controls">
-              <FancyCounter value={n} onChange={setN} />
+              <div className="control-row" style={{alignItems:'center'}}>
+                <label className="label" style={{marginRight:10}}>Words</label>
+                <div style={{display:'flex',alignItems:'center',gap:14}}>
+                  <div className="vertical-number">
+                    <button className="arrow" onClick={()=>setN(v=>Math.max(3,Math.min(20,v+1)))} aria-label="Increase">▲</button>
+                    <input className="num" type="number" value={n} min={3} max={20} onChange={(e)=>{ const nv = Math.max(3, Math.min(20, Number(e.target.value)||3)); setN(nv); }} />
+                    <button className="arrow" onClick={()=>setN(v=>Math.max(3,Math.min(20,v-1)))} aria-label="Decrease">▼</button>
+                  </div>
+                  <Counter value={n} places={[100,10,1]} fontSize={56} padding={6} gap={8} textColor='white' fontWeight={800} />
+                </div>
+              </div>
             </div>
 
             <DecryptedText text={quote} reveal={reveal} />
@@ -190,10 +198,6 @@
                 <span className="btn-text">{loading? 'Generating...' : 'Generate'}</span>
                 <span className="spinner" aria-hidden="true" style={{display: loading? 'inline-block':'none'}}></span>
               </button>
-            </div>
-            <div style={{marginTop:8,fontSize:12,color:'#9fb0d3'}}>
-              <div>Sending n: <strong>{n}</strong></div>
-              <div style={{wordBreak:'break-all',opacity:0.85}}>Last URL: {lastURL}</div>
             </div>
 
             <footer style={{marginTop:14,fontSize:12,color:'#9fb0d3'}}>Powered by a Google Apps Script backend + OpenAI API</footer>
