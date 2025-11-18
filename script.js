@@ -1,6 +1,5 @@
 // Replace the placeholder below with your deployed Google Apps Script web app URL.
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbz8kS9eEfM38RwB-SrWnu5X0u4MVDyGzjhcco0_rbLTyYIWuqM9oHaZQNgwMyA5D2Zl1w/exec';
-
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwqkeV4aJ4Nd4TP5Qi8aZ8PMBuCWWQPrG_OtcgjcT4JKbLmR03bH4w8zWzkQSRLu06jHA/exec';
 const btn = document.getElementById('generate');
 const quoteEl = document.getElementById('quote');
 
@@ -13,7 +12,7 @@ async function generate() {
     const data = await res.json();
     quoteEl.textContent = data.quote || 'No quote returned.';
   } catch (err) {
-    quoteEl.textContent = '!Error: ' + (err.message || err);
+    quoteEl.textContent = 'Error: ' + (err.message || err);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Generate';
