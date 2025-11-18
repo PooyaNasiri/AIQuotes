@@ -109,6 +109,43 @@
           radial-gradient(40% 70% at calc(var(--x) * 1%) calc(var(--y) * 1%), hsla(var(--hue),77%,77%,var(--a)) 0%, transparent 90%);
         background-clip: content-box, border-box; padding: 14px; z-index:-1; border-radius:inherit; animation:color 20s linear infinite both;
       }
+
+      @media (max-width:420px){
+        /* Make the card nearly full-bleed on small phones and reduce padding for readable content */
+        .card{width:calc(100% - 18px);padding:14px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,.6)}
+        body{padding:6px}
+
+        /* Quote: reduce size and margins so it fits without excessive scrolling */
+        #quote, .quote{font-size:20px;margin:14px 0 18px;line-height:1.18;min-height:92px}
+
+        /* Stack controls and tighten spacing */
+        .control-row{flex-direction:row;gap:8px;align-items:center;justify-content:center}
+        .control-row.small{font-size:12px}
+
+        /* Counter and word scroller: scale down to fit the header area */
+        .counter-container{transform:scale(0.78);transform-origin:center;display:inline-block}
+        .counter-counter{gap:6px}
+        .counter-digit{width:auto}
+
+        /* Word scroller min width handled inline; reduce by a bit when available */
+        .word-scroller, .word-scroller > div{min-width:140px}
+
+        /* Arrows: smaller hit targets but still tappable */
+        .arrow{min-width:34px;height:30px;font-size:12px;padding:6px 8px}
+
+        /* Gooey button: reduce blur and padding to save space and improve performance on phones */
+        #generate.gooey{--size:1.4em;font-size:0.95rem;padding:calc(var(--size)*0.5) calc(var(--size)*0.9);border-radius:12px}
+        #generate.gooey:before{filter: blur(8px) url(#goo) drop-shadow(0 .18em .36em rgba(0,0,0,0.55));padding:10px}
+
+        /* Tone the animated background and heavy motion on small devices */
+        #generate.gooey{transition: --a .3s ease-in-out, scale calc(var(--spring-duration)*0.6) var(--spring-easing)}
+
+        /* Reduce dot-grid visual intensity on phones to save GPU work */
+        body::before{opacity:0.04;background-size:22px 22px}
+
+        /* Slightly reduce canvas dot size if present */
+        canvas{max-height:420px}
+      }
     </style>
   </head>
   <body>
@@ -241,7 +278,7 @@
 
         const len = items.length;
         return (
-          <div style={{height:height + 'px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', minWidth: minWidth + 'px'}}>
+          <div className="word-scroller" style={{height:height + 'px', overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center', minWidth: minWidth + 'px'}}>
             <div style={{position:'relative', height: height + 'px'}}>
               {items.map((it, i) => {
                 // position each word relative to the animated fractional index, wrap circularly
@@ -452,5 +489,26 @@
         </feComponentTransfer>
       </filter>
     </svg>
-  </body>
+
+    <style>
+/* Responsive phone tweaks appended */
+@media (max-width:420px){
+  .card{padding:14px;border-radius:12px;width:calc(100% - 24px);} 
+  h1#title{font-size:14px;margin-bottom:8px;text-align:left;display:block;} 
+  #quote,.quote{font-size:22px;margin:12px 0 14px;min-height:84px;line-height:1.16;text-align:left;} 
+  .control-row{gap:8px;} 
+  .counter-container{transform:scale(0.9);transform-origin:center;} 
+  .counter-counter{gap:6px;} 
+  .arrow{min-width:34px;height:28px;font-size:12px;padding:4px 6px;} 
+  .word-scroller{transform:scale(0.88);transform-origin:center;min-width:140px;} 
+  #generate.gooey{font-size:0.95rem;--size:1.4em;padding:calc(var(--size)*0.5) calc(var(--size)*0.9);} 
+  #generate.gooey:before{filter:blur(8px);padding:8px;} 
+  #generate.gooey.animate-bg{animation:none}
+  #generate.gooey:before{background-image:linear-gradient(0deg,var(--button),var(--button)), radial-gradient(30% 60% at calc(var(--x) * 1%) calc(var(--y) * 1%), hsla(var(--hue),77%,77%,var(--a)) 0%, transparent 85%);}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</body>
 </html>
