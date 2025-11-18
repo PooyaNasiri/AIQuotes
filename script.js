@@ -1,5 +1,5 @@
 // Replace the placeholder below with your deployed Google Apps Script web app URL.
-const GAS_URL = 'hhttps://script.google.com/macros/s/AKfycbz8kS9eEfM38RwB-SrWnu5X0u4MVDyGzjhcco0_rbLTyYIWuqM9oHaZQNgwMyA5D2Zl1w/exec';
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz8kS9eEfM38RwB-SrWnu5X0u4MVDyGzjhcco0_rbLTyYIWuqM9oHaZQNgwMyA5D2Zl1w/exec';
 
 const btn = document.getElementById('generate');
 const quoteEl = document.getElementById('quote');
