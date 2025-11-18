@@ -89,12 +89,14 @@
         const [n, setN] = useState(value);
         useEffect(()=> setN(value), [value]);
         const bump = (v)=>{ const nv = Math.max(3, Math.min(20, v)); setN(nv); onChange && onChange(nv); };
-        return (
+          const [animate, setAnimate] = React.useState(false);
+          useEffect(()=>{ setAnimate(true); const t = setTimeout(()=>setAnimate(false), 360); return ()=>clearTimeout(t); }, [n]);
+          return (
           <div className="control-row" style={{alignItems:'center'}}>
             <label className="label" style={{marginRight:10}}>Words</label>
             <div className="vertical-number">
               <button className="arrow" onClick={()=>bump(n+1)} aria-label="Increase">▲</button>
-              <input className="num" type="number" value={n} min={3} max={20} onChange={(e)=>bump(Number(e.target.value)||3)} />
+                <input className={"num " + (animate? 'num-animate':'')} type="number" value={n} min={3} max={20} onChange={(e)=>bump(Number(e.target.value)||3)} />
               <button className="arrow" onClick={()=>bump(n-1)} aria-label="Decrease">▼</button>
             </div>
           </div>
@@ -103,18 +105,22 @@
 
       function App(){
         const [n, setN] = useState(5);
-        const [quote, setQuote] = useState('Click generate to receive a motivational sentence.');
-        const [loading, setLoading] = useState(false);
-        const [reveal, setReveal] = useState(false);
+          const [quote, setQuote] = useState('Click generate to receive a motivational sentence.');
+          const [loading, setLoading] = useState(false);
+          const [reveal, setReveal] = useState(false);
+          const [lastURL, setLastURL] = useState('');
         const GAS_URL = 'https://script.google.com/macros/s/AKfycbxvu4pgPyvx-N3FbGptzCzr411tmUdjnEZUzLr9XO0Bq5wG5r48hFTY0x7d7xkFittp0Q/exec';
 
         async function generate(){
           setLoading(true); setReveal(false);
           try{
             const url = GAS_URL + (GAS_URL.indexOf('?')===-1?'?':'&') + '_ts=' + Date.now() + '&n=' + encodeURIComponent(n);
+            setLastURL(url);
+            console.log('Fetching URL:', url);
             const res = await fetch(url, { cache: 'no-store' });
             if(!res.ok) throw new Error('Network ' + res.status);
             const data = await res.json();
+            console.log('Response:', data);
             setQuote(data && data.quote ? data.quote : 'No quote returned.');
             // reveal with decrypted animation
             setTimeout(()=> setReveal(true), 80);
@@ -136,6 +142,10 @@
                 <span className="btn-text">{loading? 'Generating...' : 'Generate'}</span>
                 <span className="spinner" aria-hidden="true" style={{display: loading? 'inline-block':'none'}}></span>
               </button>
+            </div>
+            <div style={{marginTop:8,fontSize:12,color:'#9fb0d3'}}>
+              <div>Sending n: <strong>{n}</strong></div>
+              <div style={{wordBreak:'break-all',opacity:0.85}}>Last URL: {lastURL}</div>
             </div>
 
             <footer style={{marginTop:14,fontSize:12,color:'#9fb0d3'}}>Powered by a Google Apps Script backend + OpenAI API</footer>
