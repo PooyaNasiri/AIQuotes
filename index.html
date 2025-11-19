@@ -23,9 +23,9 @@
       .vertical-number input[type=number].num-animate{animation:numPop .36s ease}
       @keyframes numPop{0%{transform:translateY(-6px) scale(.95);opacity:.6}50%{transform:translateY(3px) scale(1.06);opacity:1}100%{transform:translateY(0) scale(1)} }
       /* Counter styles (inspired by reactbits Counter) */
-      .counter-container { position: relative; display: inline-block; }
-      .counter-counter { display: flex; overflow: hidden; line-height: 1; }
-      .counter-digit { position: relative; width: 1ch; font-variant-numeric: tabular-nums; }
+      .counter-container { position: relative; display: inline-block; text-align:center;}
+      .counter-counter { display: flex; overflow: hidden; line-height: 1;  padding: 0px 10px 0px 10px;text-align:center; }
+      .counter-digit { position: relative; width: auto; width: 1ch; font-variant-numeric: tabular-nums; }
       .counter-number { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display:flex; align-items:center; justify-content:center; }
       /* .gradient-container { pointer-events: none; position: absolute; top: 0; bottom: 0; left: 0; right: 0; } */
       /* .bottom-gradient { position: absolute; bottom: 0; width: 100%; } */
@@ -145,6 +145,49 @@
 
         /* Slightly reduce canvas dot size if present */
         canvas{max-height:420px}
+      }
+
+      /* Responsive sizing helpers (fluid typography and component scaling) */
+      :root{
+        --card-max-width:920px;
+        --quote-min:20px; --quote-pref:5vw; --quote-max:72px;
+        --control-min:12px; --control-pref:2.2vw; --control-max:20px;
+      }
+
+      /* Make card, title and quote scale fluidly between small and large screens */
+      .card{ width: clamp(320px, min(94%, var(--card-max-width)), 1100px); }
+      h1{ font-size: clamp(16px, 1.6vw + 6px, 22px); }
+      #quote, .quote{ font-size: clamp(var(--quote-min), var(--quote-pref), var(--quote-max)); margin: clamp(16px, 3.2vw, 64px) 0 clamp(18px, 3.8vw, 72px); min-height: clamp(88px, 18vh, 220px); }
+
+      /* Tighter spacing for control rows on narrow viewports while remaining roomy on desktop */
+      .control-row{ gap: clamp(8px, 1.6vw, 18px); }
+      .control-row.small{ font-size: clamp(12px, var(--control-pref), var(--control-max)); }
+
+      /* Counter container scales instead of fixed pixel transforms — avoids very large digits on small screens */
+      .counter-container{ transform: none; }
+      .counter-counter{ gap: clamp(6px, 1.2vw, 18px); }
+      .counter-digit{ width: auto; }
+
+      /* Word scroller: scale the words fluidly and reduce min width on small screens */
+      .word-scroller{ min-width: clamp(120px, 22vw, 260px); }
+      .word-scroller > div > div{ font-size: clamp(18px, 3.6vw, 36px) !important; line-height: clamp(28px, 4.6vw, 40px) !important; }
+
+      /* Gooey button: fluid size & padding so it reads well on phones and large displays */
+      #generate.gooey{ font-size: clamp(0.9rem, 2.2vw, 1.15rem); padding: clamp(8px, 1.6vw, 16px) clamp(12px, 2.8vw, 26px); --size: clamp(1.2em, 2.6vw, 2em); border-radius: clamp(10px, 2.2vw, 20px); }
+      #generate.gooey:before{ padding: clamp(8px, 1.7vw, 14px); filter: blur(clamp(6px, 1.8vw, 12px)) url(#goo) drop-shadow(0 .22em .44em rgba(0,0,0,0.56)); }
+
+      /* Reduce decorative intensity on small devices for performance and clarity */
+      @media (max-width:520px){
+        body::before{ opacity:0.035; background-size:22px 22px; }
+        .card{ padding: clamp(10px, 2.2vw, 28px); border-radius:12px; }
+        #generate.gooey{ --size: clamp(1em, 3.4vw, 1.4em); }
+      }
+
+      /* Give larger screens a bit more breathing room */
+      @media (min-width:1200px){
+        .card{ padding:36px; border-radius:18px; }
+        #quote, .quote{ font-size: clamp(32px, 3.8vw, 72px); }
+        .control-row{ gap:20px; }
       }
     </style>
   </head>
@@ -434,12 +477,12 @@
             <div style={{position:'relative', zIndex:1}}>
               <h1 id="title" style={{fontSize:18, marginBottom:12, fontWeight:800, letterSpacing:0.4}}>
                 Generate a&nbsp;
-                <span style={{display:'inline-flex',alignItems:'center',gap:12,padding:'6px 10px'}}>
+                <span style={{display:'inline-flex',alignItems:'center',gap:10,padding:'6px 10px'}}>
                   <span style={{fontSize:16, color:'#9fb0d3'}}>[</span>
-                  <span style={{display:'inline-flex',alignItems:'center',gap:8}}>
+                  <span style={{display:'inline-flex',alignItems:'center',gap:10}}>
                     <div style={{display:'flex',flexDirection:'column',alignItems:'center',gap:6}}>
                       <button className="arrow" style={{padding:'6px 8px'}} onClick={()=>setN(v=>Math.max(3,Math.min(20,v+1)))} aria-label="Increase">▲</button>
-                      <Counter value={n} places={[10,1]} fontSize={30} padding={4} gap={6} textColor='white' fontWeight={900} />
+                      <Counter value={n} places={[10,1]} fontSize={30} padding={4} gap={20} textColor='white' fontWeight={900} />
                       <button className="arrow" style={{padding:'6px 8px'}} onClick={()=>setN(v=>Math.max(3,Math.min(20,v-1)))} aria-label="Decrease">▼</button>
                     </div>
                   </span>
