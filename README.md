@@ -1,4 +1,4 @@
-# AIQuotes — AI-powered Quote Gallery ✨
+# ✨ AIQuotes — AI-powered Quote Gallery ✨
 
 
 ![AIQuotes Image](aiquotes_image.png)
