@@ -1,7 +1,7 @@
 # ✨ AIQuotes — AI-powered Quote Gallery ✨
 
 
-![AIQuotes Image](aiquotes_image.png)
+![AIQuotes Image](assets/aiquotes_image.png)
 
 
 Live demo → [https://pooyanasiri.github.io/AIQuotes/](https://pooyanasiri.github.io/AIQuotes/)
