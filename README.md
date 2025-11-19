@@ -1,6 +1,6 @@
 # AIQuotes — AI-powered Quote Gallery ✨
 
-![AIQuotes Demo](https://img.shields.io/badge/demo-GitHub%20Pages-blue?logo=github&style=flat) ![License](https://img.shields.io/badge/license-See%20repo-lightgrey?style=flat) ![Status](https://img.shields.io/badge/status-active-brightgreen?style=flat)
+![AIQuotes Demo](https://img.shields.io/badge/demo-GitHub%20Pages-blue?logo=github&style=flat) ![License](https://img.shields.io/badge/license-MIT-blue?style=flat) ![Status](https://img.shields.io/badge/status-active-brightgreen?style=flat)
 
 Live demo → https://pooyanasiri.github.io/AIQuotes/
 
@@ -87,7 +87,7 @@ Suggested commit message when applying this README:
 "chore: refresh README — highlight demo and reflect recent UI updates"
 
 License & Contact
-- See the repository for license details.
+- This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 - Author: Pooya Nasiri — https://github.com/PooyaNasiri
 
 Acknowledgements
