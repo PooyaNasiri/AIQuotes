@@ -4,8 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>AIQuotes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Indie+Flower&family=Caveat&display=swap" rel="stylesheet">
     <style>
-      body{font-family:system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;display:flex;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#07132b 0%, #081426 40%, #10243a 100%);color:#e6eef8;margin:0}
+      body{ font-family:  "Comic Sans MS";display:flex;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#07132b 0%, #081426 40%, #10243a 100%);color:#e6eef8;margin:0}
       .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:28px;border-radius:14px;box-shadow:0 10px 40px rgba(2,6,23,.7);width:min(760px,94%);text-align:center;border:1px solid rgba(255,255,255,0.03)}
       h1{margin:0 0 12px 0;font-size:20px;letter-spacing:.6px}
       .controls{display:flex;flex-direction:column;gap:10px;align-items:center;margin-bottom:14px}
@@ -50,7 +51,7 @@
       button#generate.loading{box-shadow:0 14px 40px rgba(45,212,191,.08);transform:translateY(-2px)}
       button#generate.loading .btn-text{transform:translateX(-6px)}
       /* spinner already present */
-      button#generate .btn-text{display:inline-block;transition:transform .18s cubic-bezier(.2,.9,.2,1)}
+      button#generate .btn-text{display:inline-block;transition:transform .18s cubic-bezier(.2,.9,.2,1); padding: 10px;}
       /* apply styles to both id and class-based quote elements */
       /* Large, well-spaced quote area */
       #quote, .quote{
@@ -63,14 +64,12 @@
         z-index:2; /* ensure quote sits above decorative layers */
         position:relative;
         text-wrap:balance;
-        cursor: pointer;
-        -webkit-tap-highlight-color: rgba(0,0,0,0);
       }
       #quote:focus, .quote:focus{ outline:3px solid rgba(124,58,237,0.14); outline-offset:6px }
 
       /* small decorative shimmer when generating */
       .shimmer{position:relative;overflow:hidden}
-      .shimmer:after{content:'';position:absolute;left:-40%;top:0;width:40%;height:100%;transform:skewX(-18deg);background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.07), rgba(255,255,255,0));opacity:0;transition:opacity .12s}
+      .shimmer:after{content:'';position:absolute;left:-40%;top:0;width:40%;height:100%;transform:skewX(-18deg);background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.07), rgba(255,255,255,0));opacity:100;transition:opacity .12s}
       /* button#generate.loading ~ .quote.shimmer:after{opacity:1;animation:shimmer 900ms linear} */
       @keyframes shimmer{0%{left:-40%}100%{left:140%}}
 
@@ -98,12 +97,12 @@
 
       /* Make the generate button purely gooey (single visible blurred layer) */
       #generate.gooey{
-        --a: 0%; --hue: 170deg; --x:50; --y:50; --button: hsl(var(--hue),66%,66%); --size:2em;
+        --a: 0%; --hue: 170deg; --x:50; --y:50; --button: hsl(var(--hue),100%,100%); --size:2em;
         background: transparent; /* no solid base — visual comes from :before */
         color: #041025; /* text color placed above the goo layer */
         font-size:1.05rem; position:relative; padding:calc(var(--size)*0.6) calc(var(--size)*1.2);
         transition: --a .45s ease-in-out, scale var(--spring-duration) var(--spring-easing); scale:0.98;
-        isolation:isolate; border-radius:14px; cursor:pointer; border:none; box-shadow:none;
+        isolation:isolate; border-radius:94px; cursor:pointer; border:none; box-shadow:none;
       }
       #generate.gooey:hover{ --a:100%; transition-duration:.45s,1s; scale:1 }
 
@@ -113,7 +112,7 @@
         background-image:
           linear-gradient(0deg, var(--button), var(--button)),
           radial-gradient(40% 70% at calc(var(--x) * 1%) calc(var(--y) * 1%), hsla(var(--hue),77%,77%,var(--a)) 0%, transparent 90%);
-        background-clip: content-box, border-box; padding: 14px; z-index:-1; border-radius:inherit; animation:color 20s linear infinite both;
+        background-clip: content-box, border-box; padding: 14px; z-index:-1; border-radius:94px; animation:color 20s linear infinite both;
       }
 
       @media (max-width:420px){
