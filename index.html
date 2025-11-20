@@ -530,7 +530,7 @@
             if(!res.ok) throw new Error('Network ' + res.status);
             const data = await res.json();
             console.log('Response:', data);
-            setQuote(data && data.quote ? data.quote : 'No quote returned.');
+            setQuote(data && data.quote ? data.quote : 'API rate limit reached! Please try again later.');
             // reveal with decrypted animation
             setTimeout(()=> setReveal(true), 80);
           }catch(err){ setQuote('Error: ' + (err.message||err)); setReveal(true); }
